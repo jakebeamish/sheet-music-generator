@@ -1,0 +1,143 @@
+<!-- 
+    How should note tails be joined nicely, automatically?
+
+    Can I get the score to be centered?
+
+
+
+-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abc.js generator</title>
+
+    <style>
+
+        .container {
+            align-content: center;
+            margin-left: auto;
+            margin-right: auto;
+
+        }
+
+        .container svg {
+
+            margin: 0;
+            /* background: yellow; */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-right: -50%;
+            transform: translate(-50%, -50%)
+        }
+
+        #inputForm {
+            font-family: monospace;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+    </style>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.2.2/abcjs-basic-min.min.js"
+        integrity="sha512-REXLcx385NL3ZWosam5LzLJoA0AkfeVdW94IQURSM/Gl6EyrS0hS3LtqR094d00lsicEVAprWA5SUTD5oljapg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script type="text/javascript">
+
+        // let patternNumber;
+
+
+        // MDN function for converting numbers to 32 bit strings
+        function createBinaryString(nMask) {
+            // nMask must be between -2147483648 and 2147483647
+            for (var nFlag = 0, nShifted = nMask, sMask = ""; nFlag < 32;
+                nFlag++, sMask += String(nShifted >>> 31), nShifted <<= 1);
+            return sMask;
+        }
+
+        function reverseString(str) {
+            return str
+                .split('')
+                .reverse()
+                .join('')
+        }
+
+        function createAbcString(binaryString) {
+            let abcString = "";
+            for (let b in binaryString) {
+                // console.log(binaryString[b])
+                if (binaryString[b] === '0') { abcString += "z xxxxxx" }
+                else {
+                    abcString += "B xxxxxxx ";
+                }
+            }
+
+
+            return abcString;
+        }
+
+        function randomize() {
+            let randomNumber = Math.floor(Math.random() * 256);
+            document.getElementById("patternNumber").setAttribute("value", randomNumber);
+        }
+
+
+        function load() {
+
+            let patternNumber = document.getElementById("patternNumber").value;
+            let patternLength = document.getElementById("patternLength").value;
+
+            let binary = createBinaryString(patternNumber);
+            let pattern = createAbcString(reverseString(binary.slice(-patternLength)));
+
+            var abcString = "T: Pattern " + patternNumber + "\n" +
+                "O: #" + patternNumber + " of " + (Math.pow(2, patternLength) - 1) + " of length " + patternLength + "\n" +
+                "L: 1/8\n" +
+                "K: perc stafflines=1\n" + pattern;
+
+            var visualOptions = { "staffwidth": "400" };
+            var visualObj = ABCJS.renderAbc("paper", abcString, visualOptions);
+        }
+
+    </script>
+
+
+</head>
+
+<body onload="load()">
+
+<!-- <body> -->
+
+    <div id="inputForm">
+    <form action="">
+        <label for="patternNumber">Pattern number: </label>
+        <input oninput="load()" type="number" name="patternNumber" id="patternNumber"
+             value="1" min="0" max="65535" style="width: 8em" required />
+        <!-- <button onclick="randomize()">Randomize</button> -->
+        <!-- <br> -->
+        <p></p>
+        <label for="patternLength">Pattern length: </label>
+        <input oninput="load()" type="number" name="patternLength" id="patternLength"
+            min="1" max="16" value="8" style="width: 8em" required />
+    </form>
+    <hr>
+    <br>
+</div>
+    <div class="container">
+        <div id="paper"></div>
+    </div>
+
+</body>
+
+</html>

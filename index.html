@@ -13,7 +13,6 @@
     <title>abc.js generator</title>
 
     <style>
-
         .container {
             align-content: center;
             margin-left: auto;
@@ -38,7 +37,6 @@
             margin-left: auto;
             margin-right: auto;
         }
-        
     </style>
 
 
@@ -68,18 +66,82 @@
                 .join('')
         }
 
+        function padString(str) {
+            return str
+                .split(' ')
+                .join(' x ');
+        }
+
         function createAbcString(binaryString) {
             let abcString = "";
             for (let b in binaryString) {
                 // console.log(binaryString[b])
-                if (binaryString[b] === '0') { abcString += "z xxxxxx" }
+
+                // Janky way to add a decent amount of spacing TODO
+
+                // if (binaryString[b] === '0') { abcString += "z xxxxxx" }
+                // else {
+                //     abcString += "B xxxxxxx ";
+                // }
+
+                if (binaryString[b] === '0') { abcString += "z " }
                 else {
-                    abcString += "B xxxxxxx ";
+                    abcString += "B ";
                 }
+
             }
 
 
             return abcString;
+        }
+
+        function formatBeats(abcString) {
+            let formattedAbcString = "";
+
+            // for (let i = 0; i < abcString.length; i += 2) {
+            //     if (abcString.charAt(i) === "B") {
+            //         if ((i / 2) % 2 === 0) {
+            //             if (abcString.charAt(i + 2) === "B")
+            //                 formattedAbcString += "BB ";
+            //                 i += 2;
+            //         } else {
+            //             formattedAbcString += abcString.charAt(i);
+            //              formattedAbcString += abcString.charAt(i + 1);
+            //         }
+            //     } else {
+            //         formattedAbcString += abcString.charAt(i);
+            //         formattedAbcString += abcString.charAt(i + 1);
+            //     }
+            // }
+
+            formattedAbcString = abcString;
+
+            return formattedAbcString;
+        }
+
+        function formatRests(abcString) {
+            let formattedAbcString = "";
+            for (let i = 0; i < abcString.length; i += 2) {
+                if (abcString.charAt(i) === "B") {
+                    formattedAbcString += "B ";
+                }
+
+                if (abcString.charAt(i) === "z") {
+                    if ((i / 2) % 2 === 0 && abcString.charAt(i + 2) === "z") {
+                        formattedAbcString += "z2 ";
+                        i += 2;
+                    }
+
+                    else {
+                        formattedAbcString += "z "
+                    }
+
+                }
+                console.log(i, (i / 2), abcString.charAt(i))
+                console.log(formattedAbcString)
+            }
+
+            return formattedAbcString;
         }
 
         function randomize() {
@@ -94,7 +156,7 @@
             let patternLength = document.getElementById("patternLength").value;
 
             let binary = createBinaryString(patternNumber);
-            let pattern = createAbcString(reverseString(binary.slice(-patternLength)));
+            let pattern = padString(formatBeats(formatRests(createAbcString(reverseString(binary.slice(-patternLength))))));
 
             var abcString = "T: Pattern " + patternNumber + "\n" +
                 "O: #" + patternNumber + " of " + (Math.pow(2, patternLength) - 1) + " of length " + patternLength + "\n" +
@@ -112,23 +174,19 @@
 
 <body onload="load()">
 
-<!-- <body> -->
-
     <div id="inputForm">
-    <form action="">
-        <label for="patternNumber">Pattern number: </label>
-        <input oninput="load()" type="number" name="patternNumber" id="patternNumber"
-             value="1" min="0" max="65535" style="width: 8em" required />
-        <!-- <button onclick="randomize()">Randomize</button> -->
-        <!-- <br> -->
-        <p></p>
-        <label for="patternLength">Pattern length: </label>
-        <input oninput="load()" type="number" name="patternLength" id="patternLength"
-            min="1" max="16" value="8" style="width: 8em" required />
-    </form>
-    <hr>
-    <br>
-</div>
+        <form action="">
+            <label for="patternNumber">Pattern number: </label>
+            <input oninput="load()" type="number" name="patternNumber" id="patternNumber" value="11" min="0" max="65535"
+                style="width: 8em" required />
+            <p></p>
+            <label for="patternLength">Pattern length: </label>
+            <input oninput="load()" type="number" name="patternLength" id="patternLength" min="1" max="16" value="8"
+                style="width: 8em" required />
+        </form>
+        <hr>
+        <br>
+    </div>
     <div class="container">
         <div id="paper"></div>
     </div>
